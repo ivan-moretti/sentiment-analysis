@@ -1,4 +1,19 @@
-# function that removes punctuation characters
+punctuation_chars = ["'", '"', ",", ".", "!", ":", ";", '#', '@']
+# lists of words to use
+positive_words = []
+with open("positive_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            positive_words.append(lin.strip())
+
+
+negative_words = []
+with open("negative_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            negative_words.append(lin.strip())
+
+
 def strip_punctuation(str):
     for char in punctuation_chars:
         if char in str:
@@ -29,55 +44,61 @@ def get_neg(str):
             negative_words_count +=1
     return negative_words_count
 
-# I added '-' and '…' (the ellipsis symbol, not just three dots one after another) 
-# to punctuation_chars, since those symbols are also in the text
-punctuation_chars = ["'", '"', ",", ".", "!", ":", ";", '#', '@', '-', '…']
 
-# lists of words to use
-positive_words = []
-with open("positive_words.txt") as pos_w:
-    for lin in pos_w:
-        if lin[0] != ';' and lin[0] != '\n':
-            positive_words.append(lin.strip())
+def main():
+    # I added '-' and '…' (the ellipsis symbol, not just three dots one after another) 
+    # to punctuation_chars, since those symbols are also in the text
+    punctuation_chars = ["'", '"', ",", ".", "!", ":", ";", '#', '@', '-', '…']
 
-
-negative_words = []
-with open("negative_words.txt") as neg_w:
-    for lin in neg_w:
-        if lin[0] != ';' and lin[0] != '\n':
-            negative_words.append(lin.strip())
+    # lists of words to use
+    positive_words = []
+    with open("positive_words.txt") as pos_w:
+        for lin in pos_w:
+            if lin[0] != ';' and lin[0] != '\n':
+                positive_words.append(lin.strip())
 
 
-tweets = []
-
-# open the csv
-fileconnection = open("project_twitter_data.csv", 'r')
-lines = fileconnection.readlines()
-# split the first row to get the field names
-header = lines[0]
-# split other rows to get values
-field_names = header.strip().split(',')
-for row in lines[1:]:
-    vals = row.strip().split(',')
-    # transform text to int for number of retweets and replies
-    vals[1] = int(vals[1])
-    vals[2] = int(vals[2])
-    tweets.append(vals)
+    negative_words = []
+    with open("negative_words.txt") as neg_w:
+        for lin in neg_w:
+            if lin[0] != ';' and lin[0] != '\n':
+                negative_words.append(lin.strip())
 
 
-# create output file
-outfile = open("resulting_data.csv", "w")
-# output the header row
-outfile.write('Number of Retweets, Number of Replies, Positive Score, Negative Score, Net Score') 
-outfile.write('\n')
+    tweets = []
 
-# output each of the rows:
-for i in tweets:
-    pos_wrd = get_pos(i[0])
-    neg_wrd = get_neg(i[0])
-    net_wrd = pos_wrd - neg_wrd
-    row_string = '{},{},{},{},{}'.format(i[1], i[2], pos_wrd, neg_wrd, net_wrd)
-    outfile.write(row_string)
+    # open the csv
+    fileconnection = open("project_twitter_data.csv", 'r')
+    lines = fileconnection.readlines()
+    # split the first row to get the field names
+    header = lines[0]
+    # split other rows to get values
+    field_names = header.strip().split(',')
+    for row in lines[1:]:
+        vals = row.strip().split(',')
+        # transform text to int for number of retweets and replies
+        vals[1] = int(vals[1])
+        vals[2] = int(vals[2])
+        tweets.append(vals)
+
+
+    # create output file
+    outfile = open("resulting_data.csv", "w")
+    # output the header row
+    outfile.write('Number of Retweets, Number of Replies, Positive Score, Negative Score, Net Score') 
     outfile.write('\n')
-print(outfile)
-outfile.close()
+
+    # output each of the rows:
+    for i in tweets:
+        pos_wrd = get_pos(i[0])
+        neg_wrd = get_neg(i[0])
+        net_wrd = pos_wrd - neg_wrd
+        row_string = '{},{},{},{},{}'.format(i[1], i[2], pos_wrd, neg_wrd, net_wrd)
+        outfile.write(row_string)
+        outfile.write('\n')
+    print(outfile)
+    outfile.close()
+    
+    
+if __name__ == '__main__':
+    main()
